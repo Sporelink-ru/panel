@@ -1,12 +1,20 @@
 import { useEffect, useState } from 'react';
-import { fetchManifest, fetchBalance, credit, NODE_IDS, type Manifest } from '../api';
+import {
+  fetchManifest, fetchBalance, credit,
+  fetchReputation, updateReputation,
+  NODE_IDS,
+  type Manifest, type Reputation,
+  testNodeAuth,
+} from '../api';
 import { loadAuth, clearAuth } from '../auth';
 
 export default function Dashboard({ onLogout }: { onLogout: () => void }) {
   const auth = loadAuth();
   const [manifest, setManifest] = useState<Manifest | null>(null);
   const [balances, setBalances] = useState<Record<string, number>>({});
+  const [rep, setRep] = useState<Reputation | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [authResult, setAuthResult] = useState<string | null>(null);
 
   async function refresh() {
     try {
@@ -17,6 +25,7 @@ export default function Dashboard({ onLogout }: { onLogout: () => void }) {
         b[node] = r.balance;
       }
       setBalances(b);
+      setRep(await fetchReputation(auth!.selectedProfile.id));
     } catch (err) {
       setError((err as Error).message);
     }
@@ -31,19 +40,76 @@ export default function Dashboard({ onLogout }: { onLogout: () => void }) {
     await refresh();
   }
 
+  async function adjustRep(delta: number) {
+    await updateReputation(auth!.selectedProfile.id, { delta });
+    await refresh();
+  }
+
+  async function testAuth() {
+    setAuthResult('checking...');
+    try {
+      const res = await testNodeAuth('node-a', auth!.accessToken);
+      if (res.error) {
+        setAuthResult(`❌ ${res.error} (rep: ${res.reputation}, req: ${res.required})`);
+      } else {
+        setAuthResult(`✅ Allowed! Player: ${res.name}, Rep: ${res.reputation}`);
+      }
+    } catch (e) {
+      setAuthResult(`Network error: ${(e as Error).message}`);
+    }
+  }
+
   if (!auth) return null;
 
   return (
-    <div style={{ maxWidth: 800, margin: '40px auto' }}>
+    <div style={{ maxWidth: 900, margin: '40px auto' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h2>Dashboard</h2>
+        <h2>
+          Dashboard — {auth.selectedProfile.name}
+          {rep && (
+            <>
+              {' '}
+              <span style={{
+                background: rep.reputation >= 0 ? '#1abc5b' : '#e74c3c',
+                color: '#fff',
+                padding: '2px 8px',
+                borderRadius: 12,
+                fontSize: 13,
+                fontWeight: 600,
+              }}>
+                rep {rep.reputation}
+              </span>
+              {rep.roles.map((r) => (
+                <span key={r} style={{
+                  background: '#3498db',
+                  color: '#fff',
+                  padding: '2px 8px',
+                  borderRadius: 12,
+                  fontSize: 12,
+                  marginLeft: 6,
+                }}>
+                  {r}
+                </span>
+              ))}
+            </>
+          )}
+        </h2>
         <div>
-          <strong>{auth.selectedProfile.name}</strong>{' '}
           <button onClick={() => { clearAuth(); onLogout(); }}>Logout</button>
         </div>
       </div>
 
       {error && <div style={{ color: 'crimson' }}>{error}</div>}
+
+      <h3>Reputation & Policy</h3>
+      <div style={{ marginBottom: 16 }}>
+        <button onClick={() => adjustRep(+1)}>+1</button>{' '}
+        <button onClick={() => adjustRep(-10)}>−10</button>{' '}
+        <button onClick={testAuth} style={{ marginLeft: 12, fontWeight: 'bold' }}>
+          Test Node Auth
+        </button>
+        {authResult && <div style={{ marginTop: 8, color: authResult.includes('✅') ? 'green' : 'red' }}>{authResult}</div>}
+      </div>
 
       <h3>Nodes</h3>
       {manifest ? (

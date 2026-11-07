@@ -78,3 +78,45 @@ export async function transfer(
 }
 
 export const NODE_IDS = Object.keys(NODES);
+
+export type Reputation = {
+  player_id: string;
+  name: string;
+  reputation: number;
+  roles: string[];
+};
+
+export async function fetchReputation(playerId: string): Promise<Reputation> {
+  const r = await fetch(`${HUB}/reputation/${encodeURIComponent(playerId)}`);
+  if (!r.ok) throw new Error(`reputation failed: ${r.status}`);
+  return r.json();
+}
+
+export async function fetchPlayers(): Promise<Reputation[]> {
+  const r = await fetch(`${HUB}/players`);
+  if (!r.ok) throw new Error(`players failed: ${r.status}`);
+  return r.json();
+}
+
+export async function updateReputation(
+  playerId: string,
+  change: { delta?: number; set?: number },
+): Promise<Reputation> {
+  const r = await fetch(`${HUB}/reputation/${encodeURIComponent(playerId)}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(change),
+  });
+  if (!r.ok) throw new Error(`update failed: ${r.status}`);
+  return r.json();
+}
+
+export async function testNodeAuth(node: string, jwt: string): Promise<any> {
+  const base = NODES[node] ?? node;
+  const r = await fetch(`${base}/auth/player`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ jwt }),
+  });
+  return r.json();
+}
