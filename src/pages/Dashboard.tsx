@@ -94,9 +94,6 @@ export default function Dashboard({ onLogout }: { onLogout: () => void }) {
             </>
           )}
         </h2>
-        <div>
-          <button onClick={() => { clearAuth(); onLogout(); }}>Logout</button>
-        </div>
       </div>
 
       {error && <div style={{ color: 'crimson' }}>{error}</div>}

@@ -120,3 +120,16 @@ export async function testNodeAuth(node: string, jwt: string): Promise<any> {
   });
   return r.json();
 }
+
+export async function register(username: string, password: string, email: string): Promise<any> {
+  const r = await fetch(`${HUB}/authserver/register`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username, password, email }),
+  });
+  if (!r.ok) {
+    const err = await r.json();
+    throw new Error(err.error || 'Registration failed');
+  }
+  return r.json();
+}
