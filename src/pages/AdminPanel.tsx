@@ -75,7 +75,11 @@ export default function AdminPanel() {
                 {u.roles.map(r => <span key={r} className={`badge badge-${r === 'moderator' ? 'mod' : r}`}>{r}</span>)}
               </td>
               <td>
-                <select onChange={(e) => updateRole(u.uuid, e.target.value)} value="">
+                <select 
+                  onChange={(e) => updateRole(u.uuid, e.target.value)} 
+                  value=""
+                  style={{ width: 'auto', marginBottom: 0, padding: '6px 10px' }}
+                >
                   <option value="" disabled>Change role...</option>
                   <option value="player">Make Player</option>
                   <option value="moderator">Make Moderator</option>

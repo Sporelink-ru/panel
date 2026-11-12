@@ -12,16 +12,16 @@ export default function Transfer() {
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
-    setResult('…');
+    setResult('Транзакция...');
     try {
       const r = await transfer(fromNode, toNode, auth!.selectedProfile.id, toPlayer, amount);
       const fromBal = await fetchBalance(fromNode, auth!.selectedProfile.id);
       const toBal = await fetchBalance(toNode, toPlayer);
       setResult(
-        `Result: ${'status' in r ? r.status : r.error}\n` +
-        `tx_id: ${r.tx_id ?? '—'}\n` +
-        `balance[${fromNode}]: ${fromBal.balance}\n` +
-        `balance[${toNode}]: ${toBal.balance}`,
+        `Статус: ${'status' in r ? r.status : r.error}\n` +
+        `TX ID: ${r.tx_id ?? '—'}\n` +
+        `Баланс [${fromNode}]: ${fromBal.balance}\n` +
+        `Баланс [${toNode}]: ${toBal.balance}`,
       );
     } catch (err) {
       setResult((err as Error).message);
@@ -31,30 +31,45 @@ export default function Transfer() {
   if (!auth) return null;
 
   return (
-    <form onSubmit={submit} style={{ maxWidth: 600, margin: '40px auto' }}>
-      <h2>Transfer</h2>
-      <div>
-        From node:{' '}
-        <select value={fromNode} onChange={(e) => setFromNode(e.target.value)}>
-          {NODE_IDS.map((n) => <option key={n}>{n}</option>)}
-        </select>
-        {' '}→ To node:{' '}
-        <select value={toNode} onChange={(e) => setToNode(e.target.value)}>
-          {NODE_IDS.map((n) => <option key={n}>{n}</option>)}
-        </select>
+    <div className="page-content animate-in">
+      <div className="card">
+        <h2 style={{ marginTop: 0 }}>Перевод средств</h2>
+        
+        <form onSubmit={submit} style={{ marginTop: 20 }}>
+          <div style={{ display: 'flex', gap: 16, marginBottom: 16 }}>
+            <div className="form-group" style={{ flex: 1 }}>
+              <label className="form-label">Откуда (Node):</label>
+              <select value={fromNode} onChange={(e) => setFromNode(e.target.value)}>
+                {NODE_IDS.map((n) => <option key={n} value={n}>{n}</option>)}
+              </select>
+            </div>
+            <div className="form-group" style={{ flex: 1 }}>
+              <label className="form-label">Куда (Node):</label>
+              <select value={toNode} onChange={(e) => setToNode(e.target.value)}>
+                {NODE_IDS.map((n) => <option key={n} value={n}>{n}</option>)}
+              </select>
+            </div>
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">UUID получателя:</label>
+            <input value={toPlayer} onChange={(e) => setToPlayer(e.target.value)} />
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">Сумма:</label>
+            <input type="number" value={amount} onChange={(e) => setAmount(Number(e.target.value))} />
+          </div>
+
+          <button type="submit" style={{ width: '100%', marginTop: 8 }}>Отправить</button>
+        </form>
+
+        {result && (
+          <pre style={{ marginTop: 20, background: 'var(--bg)', padding: 16, borderRadius: 8, color: 'var(--success)', whiteSpace: 'pre-wrap', fontFamily: 'monospace' }}>
+            {result}
+          </pre>
+        )}
       </div>
-      <div style={{ marginTop: 8 }}>
-        To player ID:{' '}
-        <input value={toPlayer} onChange={(e) => setToPlayer(e.target.value)}
-               style={{ width: 320 }} />
-      </div>
-      <div style={{ marginTop: 8 }}>
-        Amount:{' '}
-        <input type="number" value={amount}
-               onChange={(e) => setAmount(Number(e.target.value))} />
-      </div>
-      <button type="submit" style={{ marginTop: 12 }}>Send</button>
-      {result && <pre style={{ marginTop: 12, background: '#f4f4f4', padding: 8 }}>{result}</pre>}
-    </form>
+    </div>
   );
 }

@@ -1,51 +1,191 @@
 :root {
   --bg: #0f172a;
   --panel: #1e293b;
+  --panel-hover: #334155;
   --text: #f8fafc;
   --text-muted: #94a3b8;
   --primary: #3b82f6;
   --primary-hover: #2563eb;
+  --border: #334155;
   --danger: #ef4444;
   --success: #10b981;
-  --border: #334155;
 }
+
+* { box-sizing: border-box; }
 
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  background-color: var(--bg);
+  background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+  background-attachment: fixed;
   color: var(--text);
+  min-height: 100vh;
 }
 
-.container { max-width: 900px; margin: 0 auto; padding: 20px; }
-.card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 24px; margin-bottom: 20px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
-h1, h2, h3 { margin-top: 0; font-weight: 600; }
-input, select { width: 100%; padding: 10px 14px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; color: white; margin-bottom: 12px; box-sizing: border-box; outline: none; }
-input:focus { border-color: var(--primary); }
-button { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 500; transition: 0.2s; }
-button:hover:not(:disabled) { background: var(--primary-hover); }
+/* ─── Скроллбар ───────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+/* ─── Анимации ────────────────────────────────────────────────── */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-in {
+  animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* ─── Контейнеры ──────────────────────────────────────────────── */
+.page-content {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 40px 20px; /* Отступ сверху от шапки */
+}
+
+.card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+/* ─── Навигация ───────────────────────────────────────────────── */
+.navbar {
+  display: flex;
+  gap: 8px;
+  padding: 12px 24px;
+  background: rgba(30, 41, 59, 0.8);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.navbar button {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-muted);
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+.navbar button:hover:not(:disabled) { background: var(--panel-hover); color: var(--text); }
+.navbar button:disabled { background: var(--primary); color: white; opacity: 1; }
+
+/* ─── Формы ───────────────────────────────────────────────────── */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.form-label {
+  font-size: 13px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+input:not([type="radio"]):not([type="checkbox"]):not([type="file"]),
+select {
+  width: 100%;
+  padding: 12px 16px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s;
+  font-family: inherit;
+}
+
+input:not([type="radio"]):not([type="checkbox"]):not([type="file"]):focus,
+select:focus {
+  border-color: var(--primary);
+}
+
+/* Красивая кнопка для загрузки файла */
+.file-upload-label {
+  display: inline-block;
+  padding: 10px 16px;
+  background: var(--panel-hover);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  text-align: center;
+  transition: all 0.2s;
+  width: 100%;
+}
+.file-upload-label:hover { background: var(--border); }
+
+/* ─── Кнопки ──────────────────────────────────────────────────── */
+button {
+  padding: 10px 20px;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+button:hover:not(:disabled) { background: var(--primary-hover); transform: translateY(-1px); }
 button:disabled { opacity: 0.5; cursor: not-allowed; }
 button.secondary { background: var(--border); }
-button.secondary:hover { background: #475569; }
 button.danger { background: var(--danger); }
-.navbar { display: flex; gap: 8px; padding: 16px; background: var(--panel); border-bottom: 1px solid var(--border); margin-bottom: 24px; }
-.badge { padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; display: inline-block; margin-right: 6px; }
-.badge-player { background: #334155; color: #e2e8f0; }
-.badge-mod { background: #8b5cf6; color: white; }
-.badge-admin { background: #f59e0b; color: white; }
-.badge-ceo { background: #ef4444; color: white; }
+
+/* ─── Таблицы ─────────────────────────────────────────────────── */
 table { width: 100%; border-collapse: collapse; margin-top: 16px; }
-th, td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border); }
-th { color: var(--text-muted); font-weight: 500; font-size: 14px; }
+th, td { padding: 14px 12px; text-align: left; border-bottom: 1px solid var(--border); }
+th { color: var(--text-muted); font-weight: 500; font-size: 13px; text-transform: uppercase; }
+tr:hover { background: rgba(255, 255, 255, 0.02); }
+
+/* ─── Бейджи ──────────────────────────────────────────────────── */
+.badge { padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; display: inline-block; margin-right: 6px; }
+.badge-player { background: var(--border); color: var(--text); }
+.badge-creator { background: #8b5cf6; color: white; }
+.badge-mod, .badge-moderator { background: #f59e0b; color: white; }
+.badge-admin { background: var(--primary); color: white; }
+.badge-ceo { background: var(--danger); color: white; }
+
+/* ─── Кастомные радиокнопки ───────────────────────────────────── */
+.custom-radio { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; font-size: 14px; color: var(--text-muted); }
+.custom-radio input[type="radio"] { display: none; }
+.custom-radio .checkmark {
+  width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--border);
+  background: var(--bg); position: relative; transition: all 0.2s;
+}
+.custom-radio .checkmark::after {
+  content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0);
+  width: 8px; height: 8px; border-radius: 50%; background: var(--primary);
+  transition: transform 0.2s; box-shadow: 0 0 8px var(--primary);
+}
+.custom-radio input:checked + .checkmark { border-color: var(--primary); }
+.custom-radio input:checked + .checkmark::after { transform: translate(-50%, -50%) scale(1); }
+.custom-radio input:checked ~ span { color: var(--text); font-weight: 500; }
+
+/* ─── Ссылки в формах ─────────────────────────────────────────── */
 a.auth-link {
-  color: var(--primary);
-  text-decoration: none;
+  color: var(--primary) !important;
+  text-decoration: none !important;
   font-size: 14px;
   font-weight: 500;
   transition: color 0.2s ease;
+  cursor: pointer;
 }
 
 a.auth-link:hover {
-  color: var(--text);
-  text-decoration: underline;
+  color: var(--text) !important;
+  text-decoration: underline !important;
 }

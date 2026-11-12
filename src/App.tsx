@@ -30,7 +30,6 @@ export default function App() {
         <button className={tab === 'transfer' ? '' : 'secondary'} onClick={() => setTab('transfer')}>Transfer</button>
         <button className={tab === 'skins' ? '' : 'secondary'} onClick={() => setTab('skins')}>Skins</button>
         
-        {/* Показываем кнопку админки только если есть права */}
         {hasRole('admin') && (
           <button className={tab === 'admin' ? 'danger' : 'secondary'} onClick={() => setTab('admin')}>Admin</button>
         )}
@@ -39,10 +38,12 @@ export default function App() {
         <button className="secondary" onClick={() => { localStorage.clear(); setAuthed(false); }}>Logout</button>
       </nav>
       
-      {tab === 'dashboard' && <Dashboard onLogout={() => setAuthed(false)} />}
-      {tab === 'transfer' && <Transfer />}
-      {tab === 'skins' && <SkinUploader />}
-      {tab === 'admin' && <AdminPanel />}
+      <div key={tab}>
+        {tab === 'dashboard' && <Dashboard onLogout={() => setAuthed(false)} />}
+        {tab === 'transfer' && <Transfer />}
+        {tab === 'skins' && <SkinUploader />}
+        {tab === 'admin' && <AdminPanel />}
+      </div>
     </>
   );
 }
